@@ -35,9 +35,6 @@ data_avg_indirect_t1=[mean(indirect(subjS)) mean(indirect(subjPS)) mean(indirect
 sem_avg_indirect_t1=[std(indirect(subjS))/sqrt(length(subjS)) std(indirect(subjPS))/sqrt(length(subjPS)) std(indirect(subjNS))/sqrt(length(subjNS))]
 data_avg_self_t1=[mean(self(subjS)) mean(self(subjPS))]
 sem_avg_self_t1=[std(self(subjS))/sqrt(length(subjS)) std(self(subjPS))/sqrt(length(subjPS))]
-data_avg_infectionGeneral_t1=[mean(mean(infection(subjS),2)) mean(mean(infection(subjPS),2)) mean(mean(infection(subjNS),2))]
-sem_avg_infectionGeneral_t1=[std(mean(infection(subjS),2))/sqrt(length(subjS)) std(mean(infection(subjPS),2))/sqrt(length(subjPS)) std(mean(infection(subjNS),2))/sqrt(length(subjNS))]
-
 
 %% perceived risk of direct smoking
 c={'r','b','k'};
@@ -85,9 +82,9 @@ set(gca,'linewidth',2,'fontsize',18);
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Figure 2B: Correlation b/w Beliefs about the risks of smoking and infection
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clc;
-s=subjPS; % S or PS or NS 
-x=self(s); % direct or indirect or self 
+
+s=subjS; % S or PS or NS 
+x=indirect(s); % direct or indirect 
 y=Sample1_covid_PerceivedRiskOfBeingInfected(s);
 
 figure('color','w'); hold on;
@@ -104,27 +101,6 @@ yy= b0+b1*xx;
 plot(xx,yy,'linewidth',8,'color',c);
 set(gca,'linewidth',2,'fontsize',18);
 
-
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Correlation b/w Beliefs about the risks of direct and second-hand smoking
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clc;
-s=subjNS; % S or PS or NS 
-x=direct(s); % direct or indirect 
-y=indirect(s);
-[r p]=corr(x,y,'type','Pearson')
-
-
-s=subjPS; % S or PS or NS 
-x=direct(s); % direct or indirect 
-y=indirect(s);
-[r p]=corr(x,y,'type','Pearson')
-
-
-s=subjS; % S or PS or NS 
-x=direct(s); % direct or indirect 
-y=indirect(s);
-[r p]=corr(x,y,'type','Pearson')
 
 
 %% correlation test
@@ -145,33 +121,17 @@ y=indirect(s);
 % cite: https://www.mathworks.com/matlabcentral/fileexchange/61398-comparison-test-of-two-correlation-coefficient-corr_rtest-ra-rb-na-nb
 % using Fisher Z-transformation (https://www.statisticshowto.com/fisher-z/)
 
-
 smokingBelief=direct;
+[DrS,DpS]=corr(smokingBelief(subjS),infection(subjS))
+[DrPS, DpPS]=corr(smokingBelief(subjPS),infection(subjPS))
+[DrNS, DpNS]=corr(smokingBelief(subjNS),infection(subjNS))
 
-avg_infection=mean(infection,2);
-[DrS,DpS]=corr(smokingBelief(subjS),avg_infection(subjS))
-[DrPS, DpPS]=corr(smokingBelief(subjPS),avg_infection(subjPS))
-[DrNS, DpNS]=corr(smokingBelief(subjNS),avg_infection(subjNS))
-
-clc;[p, z, za, zb] = corr_rtest(DrS, DrPS, length(subjS), length(subjPS)) 
-clc;[p, z, za, zb] = corr_rtest(DrS, DrNS, length(subjS), length(subjNS)) 
-clc;[p, z, za, zb] = corr_rtest(DrPS, DrNS, length(subjPS), length(subjNS)) 
-
-%%
 smokingBelief=indirect;
-
-disp('-----------------------');
-avg_infection=mean(infection,2);
-[IDrS,IDpS]=corr(smokingBelief(subjS),avg_infection(subjS))
-[IDrPS, IDpPS]=corr(smokingBelief(subjPS),avg_infection(subjPS))
-[IDrNS, IDpNS]=corr(smokingBelief(subjNS),avg_infection(subjNS))
-
-clc;[p, z, za, zb] = corr_rtest(IDrS, IDrPS, length(subjS), length(subjPS)) 
-clc;[p, z, za, zb] = corr_rtest(IDrS, IDrNS, length(subjS), length(subjNS)) 
-clc;[p, z, za, zb] = corr_rtest(IDrPS, IDrNS, length(subjPS), length(subjNS)) 
+[IDrS,IDpS]=corr(smokingBelief(subjS),infection(subjS))
+[IDrPS, IDpPS]=corr(smokingBelief(subjPS),infection(subjPS))
+[IDrNS, IDpNS]=corr(smokingBelief(subjNS),infection(subjNS))
 
 
-%%
 clc;[p, z, za, zb] = corr_rtest(DrS, IDrS, length(subjS), length(subjS)) 
 clc;[p, z, za, zb] = corr_rtest(DrPS, IDrPS, length(subjPS), length(subjPS)) 
-clc;[p, z, za, zb] = corr_rtest(DrNS, IDrNS, length(subjNS), length(subjNS)) 
+clc;[p, z, za, zb] = corr_rtest(DrNS, IDrNS, length(subjNS), length(subjNS))
